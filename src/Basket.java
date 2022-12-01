@@ -1,6 +1,6 @@
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class Basket {
     private final String name;
@@ -8,30 +8,51 @@ public class Basket {
 
     public Basket(String name) {
         this.name = name;
-        this.list = new HashMap<>();
+        this.list = new TreeMap<>(); // alphabetical order make performance worse
     }
 
-    public int addToBasket(StockItem item, int quantity){
-        if ((item != null) && (quantity > 0)){
-            int inBasket = list.getOrDefault(item ,0);
+    public int addToBasket(StockItem item, int quantity) {
+        if ((item != null) && (quantity > 0)) {
+            int inBasket = list.getOrDefault(item, 0);
             list.put(item, inBasket + quantity);
             return inBasket;
         }
         return 0;
     }
 
-    public Map<StockItem, Integer> items(){
+    public int removeFromBasket(StockItem item, int quantity) {
+        if ((item != null) && (quantity > 0)) {
+            // check if we already have item in basket
+            int inBasket = list.getOrDefault(item, 0);
+            int newQuantity = inBasket + quantity;
+
+            if (newQuantity > 0) {
+                list.put(item, newQuantity);
+                return quantity;
+            } else if (newQuantity == 0) {
+                list.remove(item);
+                return quantity;
+            }
+        }
+        return 0;
+    }
+    public void clearBasket(){
+        this.list.clear(); // clear method from the underlying map object
+    }
+
+
+    public Map<StockItem, Integer> items() {
         return Collections.unmodifiableMap(list);
     }
 
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("\nShopping Basket " + name + " contains " + list.size() + " item \n");
+        StringBuilder s = new StringBuilder("\nShopping Basket " + name + " contains " + list.size() + ((list.size() == 1) ? " item" : " items") + "\n");
         double totalCost = 0.0;
-        for (Map.Entry<StockItem, Integer> item : list.entrySet()){
-            s.append(item.getKey().getPrice()).append(". ").append(item.getValue()).append(" purchased\n");
+        for (Map.Entry<StockItem, Integer> item : list.entrySet()) {
+            s.append(item.getKey().getName()).append(" : ").append(item.getKey().getPrice()).append(",  quantitiy = ").append(item.getValue()).append(" purchased\n");
             totalCost = item.getKey().getPrice() * item.getValue();
         }
-        return s + "Total cost " + totalCost;
+        return s + "Total cost " + String.format("%.2f", totalCost);
     }
 }
