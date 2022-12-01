@@ -16,18 +16,18 @@ public class StockList {
 
             // if there are already stocks on this item, adjust the quantity
             if (inStock != item) {
-                item.adjustStock(inStock.getQuantityStock());
+                item.adjustStock(inStock.quantityInStock());
             }
 
             list.put(item.getName(), item);
-            return item.getQuantityStock();
+            return item.quantityInStock();
         }
         return 0;
     }
 
     public int sellStock(String item, int quantity) {
         StockItem inStock = list.getOrDefault(item, null); // we want to sell so we assume the item exist
-        if ((inStock != null) && (inStock.getQuantityStock() >= quantity) && (quantity > 0)){
+        if ((inStock != null) && (inStock.quantityInStock() >= quantity) && (quantity > 0)){
             inStock.adjustStock(-quantity);
             return quantity;
         }
@@ -39,11 +39,22 @@ public class StockList {
     }
 
     public Map<String, StockItem> Items(){
-        return Collections.unmodifiableMap(list); //
+        return Collections.unmodifiableMap(list); // read-only
     }
 
     @Override
     public String toString() {
-        return
+        StringBuilder s = new StringBuilder("\nStock List\n");
+        double totalCost = 0.0;
+       for (Map.Entry<String, StockItem> item : list.entrySet()){
+           StockItem stockItem = item.getValue();
+
+           double itemValue = stockItem.getPrice() * stockItem.quantityInStock();
+
+           s.append(stockItem).append(". there are ").append(stockItem.quantityInStock()).append(" in stock. value of items: ");
+           s.append(itemValue).append("\n");
+           totalCost += itemValue;
+       }
+       return s + " total stock value" + totalCost;
     }
 }
