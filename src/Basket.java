@@ -1,3 +1,4 @@
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,5 +18,20 @@ public class Basket {
             return inBasket;
         }
         return 0;
+    }
+
+    public Map<StockItem, Integer> items(){
+        return Collections.unmodifiableMap(list);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("\nShopping Basket " + name + " contains " + list.size() + " item \n");
+        double totalCost = 0.0;
+        for (Map.Entry<StockItem, Integer> item : list.entrySet()){
+            s.append(item.getKey().getPrice()).append(". ").append(item.getValue()).append(" purchased\n");
+            totalCost = item.getKey().getPrice() * item.getValue();
+        }
+        return s + "Total cost " + totalCost;
     }
 }
